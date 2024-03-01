@@ -35,6 +35,7 @@ class Applicant:
         age = age.replace(">","")
         age = age.split("-")[0]
         return int(age)
+   
     def __lt__(self, other):
         return self.lower_age() < other.lower_age()
 
@@ -53,9 +54,21 @@ class Loan:
         
         try:
             self.property_value = float(values["property_value"])
-        except:
+        except KeyError:
             self.property_value = -1
         
+        self.applicants = []
+        
+        applicant_age = values.get("applicant_age","NA")
+        applicant_race = [values.get(f"applicant_race-{i}","NA")for i in range(1,6)]
+        
+        self.applicants.append(Applicant(applicant_age, applicant_race))
+        co_applicant_age = values.get("co-applicant_age", "9999")
+        if co_applicant_age != "9999":
+            co_applicant_race = [values.get(f"co-applicant_race-{i}","NA") for i in range(1,6)]
+            self.applicants.append(Applicant(co_applicant_age, co_applicant_race))
+
+    '''
         applicants_race = []
         applicants_race.append(Applicant(values["applicant_age"], values["applicant_race-1"]))
         if values["co-applicant_age"] != "9999":
@@ -63,7 +76,7 @@ class Loan:
         self.applicants = applicants_race
         
         self.applicants = values["applicants"]
-
+    '''
     def __str__(self):
         return f"<Loan: {self.interest_rate}% on ${self.property_value} with {len(self.applicants)} applicant(s)>"
     
@@ -85,6 +98,7 @@ class Bank:
         self.name = name
         self.loans = []
     #todo finish init
+   
     def __len__(self):
         return len(self.loans)
     
