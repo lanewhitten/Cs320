@@ -1,3 +1,8 @@
+import json
+import csv
+import zipfile as z
+import io
+
 race_lookup = {
     "1": "American Indian or Alaska Native",
     "2": "Asian",
@@ -44,17 +49,17 @@ class Loan:
     def __init__(self, values):
         try:
             self.loan_amount = float (values["loan_amount"])
-        except KeyError:
+        except:
             self.loan_amount = -1
         
         try:
             self.interest_rate = float(values["interest_rate"])
-        except KeyError:
+        except :
             self.interest_rate = -1
         
         try:
             self.property_value = float(values["property_value"])
-        except KeyError:
+        except :
             self.property_value = -1
         
         self.applicants = []
@@ -94,11 +99,47 @@ class Loan:
             amt = amt - yearly_payment
 
 class Bank:
-    def __init__(self, name, loans):
-        self.name = name
+    def __init__(self, name):
         self.loans = []
-    #todo finish init
-   
+        
+        with open("banks.json") as f:
+            data = f.read()
+        for lcv in json.loads(data):
+            if lcv["name"] == name:
+                self.name = name
+                self.lei = lcv["lei"]
+                
+        with z.ZipFile("wi.zip") as zf:
+            with zf.open("wi.csv", "r") as file:
+                reader = csv.DictReader(io.TextIOWrapper(file, "utf-8"))
+                for row in reader:
+                    if self.lei == row["lei"]:
+                        l = Loan(row)
+                        self.loans.append(l)
+
+    def average_interest_rate(self):
+        total_interest_rate = 0
+        count = 0
+
+        for loan in self.loans:
+            if loan.interest_rate != -1:
+                total_interest_rate += loan.interest_rate
+                count += 1
+
+        if count > 0:
+          average = total_interest_rate / count
+          return average
+        else:
+            return 0
+    
+    def num_applicants(self):
+        total_applicants = 0
+
+        for loan in self.loans:
+            total_applicants += len(loan.applicants)
+
+        return total_applicants
+    
     def __len__(self):
         return len(self.loans)
     
