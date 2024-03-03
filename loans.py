@@ -44,6 +44,7 @@ class Applicant:
     def __lt__(self, other):
         return self.lower_age() < other.lower_age()
 
+     
 
 class Loan:
     def __init__(self, values):
@@ -99,6 +100,16 @@ class Loan:
             amt = amt - yearly_payment
 
 class Bank:
+    
+    def loadFromZip(self, filename):
+        with z.ZipFile(filename) as zf:
+            with zf.open("wi.csv", "r") as file:
+                dictReader = csv.DictReader(io.TextIOWrapper(file, "utf-8"))
+                for dictSheet in dictReader:
+                    if self.lei == dictSheet["lei"]:
+                        l = Loan(dictSheet)
+                        self.loans.append(l)
+    
     def __init__(self, name):
         self.loans = []
         
@@ -109,13 +120,9 @@ class Bank:
                 self.name = name
                 self.lei = lcv["lei"]
                 
-        with z.ZipFile("wi.zip") as zf:
-            with zf.open("wi.csv", "r") as file:
-                reader = csv.DictReader(io.TextIOWrapper(file, "utf-8"))
-                for row in reader:
-                    if self.lei == row["lei"]:
-                        l = Loan(row)
-                        self.loans.append(l)
+        self.loadFromZip("wi.zip")
+
+    
 
     def average_interest_rate(self):
         total_interest_rate = 0
@@ -139,7 +146,18 @@ class Bank:
             total_applicants += len(loan.applicants)
 
         return total_applicants
-    
+    def ages_dict(self):
+        
+        ages_dict = {}
+        for loan in self.loans:
+            for applicant in loan.applicants:
+                if applicant.age == 9999 or applicant.age == 8888:
+                    continue
+                elif applicant.age in ages_dict:
+                    ages_dict[applicant.age] += 1
+                else:
+                    ages_dict[applicant.age] = 1
+        return sorted(ages_dict)    
     def __len__(self):
         return len(self.loans)
     

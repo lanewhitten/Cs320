@@ -22,7 +22,15 @@ class Node():
             return self.right.lookup(key)
         else:
             return None
-
+    
+#    def count_missing_rates(self):
+ #       missing_rates_count = self.values.count(-1)
+#
+ #       if self.left:
+  #          missing_rates_count += self.left.count_missing_rates()
+   ##        missing_rates_count += self.right.count_missing_rates()
+#
+ #       return missing_rates_count
 class BST():
     def __init__(self):
         self.root = None
@@ -63,7 +71,7 @@ class BST():
     def height(self):
         def calcHeight(node):
             if node is None:
-                return -1
+                return 0
             else:
                 left_height = calcHeight(node.left)
                 right_height = calcHeight(node.right)
