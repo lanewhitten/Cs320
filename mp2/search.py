@@ -78,3 +78,43 @@ class BST():
                 return max(left_height, right_height) + 1
 
         return calcHeight(self.root)
+   
+  
+    def get_top_rates(self, node, n):
+        if node is None:
+            return []
+
+        keys = []
+        keys += self.get_top_rates(node.right, n)
+
+        if len(keys) < n:
+            keys.append(node.key)
+
+        if len(keys) < n:
+            keys += self.get_top_rates(node.left, n - len(keys))
+
+            return keys
+
+    def count_non_leaf_nodes(self):
+        def count(node):
+            if node is None :
+                return 0
+            elif node.left is None and node.right is None:
+                return 0
+            else:
+                left_count = count(node.left)
+                right_count = count(node.right)
+                return left_count + right_count + 1
+
+        return count(self.root)
+    
+    def count_nodes(self):
+        def count(node):
+            if node is None:
+                return 0
+            else:
+                left_count = count(node.left)
+                right_count = count(node.right)
+                return left_count + right_count + 1
+
+        return count(self.root)
